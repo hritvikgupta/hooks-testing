@@ -166,6 +166,7 @@ def clean_file(filepath, patterns):
 
         cleaned_content = content
         for pattern, options in patterns.items():
+            replacement = options.get("replacement")
             inplace = options.get("inplace", False)
             case_sensitive = options.get("case_sensitive", True)
 
@@ -175,16 +176,17 @@ def clean_file(filepath, patterns):
             if inplace:
                 # Pattern to find file paths that start with the given pattern
                 flexible_pattern = re.compile(
-                    rf'\b{re.escape(pattern)}[^\s]*',  # Match pattern followed by any non-space characters (to match the full path)
+                    rf'{re.escape(pattern)}[^\s]*',  # Match pattern followed by any non-space characters (to match the full path)
                     flags
                 )
 
-                # Replace the matched path with just the filename (keeping the extension)
+                # Replace the matched path with the replacement value followed by the filename (keeping the extension)
                 def replace_with_filename(match):
                     full_path = match.group(0)
                     filename = os.path.basename(full_path)
-                    logging.info(f"Replacing path '{full_path}' with filename '{filename}'")
-                    return filename
+                    new_path = os.path.join(replacement, filename)
+                    logging.info(f"Replacing path '{full_path}' with '{new_path}'")
+                    return new_path
 
                 cleaned_content = flexible_pattern.sub(replace_with_filename, cleaned_content)
             else:
@@ -195,7 +197,6 @@ def clean_file(filepath, patterns):
                 )
                 def replace_value(match):
                     key = match.group('key')
-                    replacement = options.get("replacement")
                     logging.info(f"Replacing value for key '{key}' with {replacement}")
                     return f"{key} = {replacement}"
 
@@ -267,4 +268,5 @@ def main():
 
 if __name__ == '__main__':
     raise SystemExit(main())
+
 
