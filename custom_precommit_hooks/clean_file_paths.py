@@ -41,11 +41,18 @@ def clean_file(filepath, patterns):
           flags = 0 if case_sensitive else re.IGNORECASE
 
           if inplace:
-              # Pattern for matching and replacing specific paths or words
-              path_pattern = re.compile(rf'(^|[^\w/])({re.escape(pattern)})([^\w/]|$)', flags)
+              if pattern == "local":
+                  # Special case for "local" to "remote" replacement
+                  path_pattern = re.compile(rf'(^|\W)({re.escape(pattern)})(\W|$)', flags)
+              else:
+                  # Pattern for matching and replacing specific paths or words
+                  path_pattern = re.compile(rf'(^|/)({re.escape(pattern)})(/|$)', flags)
               
               def replace_path(match):
-                  return f"{match.group(1)}{replacement}{match.group(3)}"
+                  if pattern == "local":
+                      return f"{match.group(1)}{replacement}{match.group(3)}"
+                  else:
+                      return f"{match.group(1)}{replacement}{match.group(3)}"
 
               cleaned_content = path_pattern.sub(replace_path, cleaned_content)
           else:
