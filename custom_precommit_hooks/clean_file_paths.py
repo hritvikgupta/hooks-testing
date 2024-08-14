@@ -16,20 +16,15 @@ def is_binary_file(filepath):
 
 
 def clean_file(filepath, patterns):
-  # Skip .json and .yaml files
   if filepath.endswith(('.json', '.yaml', '.yml')):
-      print(f"Skipping file: {filepath}")
       return False
 
   if is_binary_file(filepath):
-      print(f"Skipping binary file: {filepath}")
       return False
   
   try:
       with open(filepath, 'r', encoding='utf-8') as file:
           content = file.read()
-
-      print(f"Original content of {filepath}:\n{content[:200]}")  # Show first 200 characters for brevity
 
       cleaned_content = content
       for pattern, options in patterns.items():
@@ -37,15 +32,13 @@ def clean_file(filepath, patterns):
           inplace = options.get("inplace", False)
           case_sensitive = options.get("case_sensitive", True)
 
-          # Adjust regex pattern for case sensitivity
-          flags = re.IGNORECASE if not case_sensitive else 0
+          flags = 0 if case_sensitive else re.IGNORECASE
 
           if inplace:
-              # Pattern for matching and replacing specific path components
-              path_pattern = re.compile(rf'(^|/)({re.escape(pattern)})(/|$)', flags)
+              # Pattern for matching and replacing specific paths or words
+              path_pattern = re.compile(rf'(^|[^\w/])({re.escape(pattern)})([^\w/]|$)', flags)
               
               def replace_path(match):
-                  # Replace only the matched pattern, preserving surrounding path components
                   return f"{match.group(1)}{replacement}{match.group(3)}"
 
               cleaned_content = path_pattern.sub(replace_path, cleaned_content)
@@ -58,25 +51,24 @@ def clean_file(filepath, patterns):
               
               def replace_value(match):
                   key = match.group('key')
-                  print(f"Replacing value for key '{key}' with {replacement}")
+                  # logging.info(f"Replacing value for key '{key}' with {replacement}")
                   return f"{key} = {replacement}"
 
               cleaned_content = assignment_pattern.sub(replace_value, cleaned_content)
 
       if content != cleaned_content:
-          print(f"Modified content of {filepath}:\n{cleaned_content[:200]}")  # Show first 200 characters for brevity
+          # logging.info(f"Modified content of {filepath}:\n{cleaned_content[:200]}")  # Show first 200 characters for brevity
           with open(filepath, 'w', encoding='utf-8') as file:
               file.write(cleaned_content)
-          print(f"File modified: {filepath}")
+          # logging.info(f"File modified: {filepath}")
           return True
       else:
-          print(f"No changes needed for file: {filepath}")
+          # logging.info(f"No changes needed for file: {filepath}")
           return False
 
   except Exception as e:
-      print(f"Error cleaning file {filepath}: {e}")
+      # logging.error(f"Error cleaning file {filepath}: {e}")
       return False
-
 
 def clean_files(patterns, include_dirs=None, enforce_all=False):
     all_files = []
