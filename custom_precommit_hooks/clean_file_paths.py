@@ -43,22 +43,17 @@ def clean_file(filepath, patterns):
             flags = 0 if case_sensitive else re.IGNORECASE
 
             if inplace:
-                # Pattern for matching and replacing entire paths (inplace)
+                # General pattern to match and replace paths
                 flexible_pattern = re.compile(
-                    rf'(?P<path>{pattern}.*?)(?P<filename>[^/\\]+$)',
+                    re.escape(pattern),  # Escapes the pattern so it can match literally
                     flags
                 )
-                def replace_path(match):
-                    filename = match.group('filename')
-                    new_path = os.path.join(replacement, filename)
-                    logging.info(f"Replacing path: {match.group(0)} with {new_path}")
-                    return new_path
-
-                cleaned_content = flexible_pattern.sub(replace_path, cleaned_content)
+                cleaned_content = flexible_pattern.sub(replacement, cleaned_content)
+                logging.info(f"Replacing '{pattern}' with '{replacement}' in {filepath}")
             else:
                 # Pattern for matching variable assignment
                 assignment_pattern = re.compile(
-                    rf'(?P<key>{pattern})(\s*=\s*)(?P<value>[^\n]*)',
+                    rf'(?P<key>{re.escape(pattern)})(\s*=\s*)(?P<value>[^\n]*)',
                     flags
                 )
                 def replace_value(match):
