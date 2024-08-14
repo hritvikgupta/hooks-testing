@@ -1,6 +1,7 @@
 import re
 import os
 import argparse
+import glob
 import json
 
 def is_binary_file(filepath):
