@@ -1,6 +1,6 @@
 -   id: clean-config-files
     name: Clean Config Files
-    entry: python3 clean_path_files.py
+    entry: python3 clean_file_paths.py
     language: system
     args: ["/PMBB", "/home/user", "/var/data", "/project", "--directories=Plink_2_0_GWAS"]
     stages: [commit]
