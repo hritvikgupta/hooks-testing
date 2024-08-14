@@ -252,6 +252,7 @@ def clean_files(patterns, include_dirs=None, enforce_all=False):
         return 1  # Return non-zero to abort the commit
     return 0
 
+
 def main():
     logging.info("\n### Cleaning Files Hook ###")
     parser = argparse.ArgumentParser()
