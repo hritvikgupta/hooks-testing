@@ -15,16 +15,22 @@ def is_binary_file(filepath):
         return False  # Assume non-binary on error
 
 
+import logging
+
 def clean_file(filepath, patterns):
   if filepath.endswith(('.json', '.yaml', '.yml')):
+      logging.info(f"Skipping file: {filepath}")
       return False
 
   if is_binary_file(filepath):
+      logging.info(f"Skipping binary file: {filepath}")
       return False
   
   try:
       with open(filepath, 'r', encoding='utf-8') as file:
           content = file.read()
+
+      logging.info(f"Original content of {filepath}:\n{content[:200]}")  # Show first 200 characters for brevity
 
       cleaned_content = content
       for pattern, options in patterns.items():
@@ -51,23 +57,23 @@ def clean_file(filepath, patterns):
               
               def replace_value(match):
                   key = match.group('key')
-                  # logging.info(f"Replacing value for key '{key}' with {replacement}")
+                  logging.info(f"Replacing value for key '{key}' with {replacement}")
                   return f"{key} = {replacement}"
 
               cleaned_content = assignment_pattern.sub(replace_value, cleaned_content)
 
       if content != cleaned_content:
-          # logging.info(f"Modified content of {filepath}:\n{cleaned_content[:200]}")  # Show first 200 characters for brevity
+          logging.info(f"Modified content of {filepath}:\n{cleaned_content[:200]}")  # Show first 200 characters for brevity
           with open(filepath, 'w', encoding='utf-8') as file:
               file.write(cleaned_content)
-          # logging.info(f"File modified: {filepath}")
+          logging.info(f"File modified: {filepath}")
           return True
       else:
-          # logging.info(f"No changes needed for file: {filepath}")
+          logging.info(f"No changes needed for file: {filepath}")
           return False
 
   except Exception as e:
-      # logging.error(f"Error cleaning file {filepath}: {e}")
+      logging.error(f"Error cleaning file {filepath}: {e}")
       return False
 
 def clean_files(patterns, include_dirs=None, enforce_all=False):
