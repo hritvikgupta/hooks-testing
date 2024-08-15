@@ -150,7 +150,7 @@ def is_binary_file(filepath):
 
 def clean_file(filepath, patterns):
     # Skip .json and .yaml files
-    if filepath.endswith(('config.json', '.yaml', '.yml')):
+    if filepath.endswith(('config.json', '.pre-commit-config.yaml', '.yml')):
         logging.info(f"Skipping file: {filepath}")
         return False
 
