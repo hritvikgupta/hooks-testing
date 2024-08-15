@@ -43,7 +43,7 @@ def clean_file(filepath, patterns):
             if inplace:
                 if pattern == "all":
                     # This handles the "all" case, replacing all paths with the replacement directory
-                    flexible_pattern = re.compile(r'(?P<path>/[^\s/]+/[^\s/]+)(?P<filename>[^/]+\.[a-zA-Z0-9]+)', flags)
+                    flexible_pattern = re.compile(r'(/[^/\s]+)+/(?P<filename>[^/]+\.[a-zA-Z0-9]+)', flags)
                     
                     def replace_with_directory(match):
                         filename = match.group('filename')
@@ -147,6 +147,7 @@ def main():
 
 if __name__ == '__main__':
     raise SystemExit(main())
+
 
 
 # import re
